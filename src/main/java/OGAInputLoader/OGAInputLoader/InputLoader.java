@@ -108,8 +108,6 @@ public class InputLoader {
         FSDataOutputStream fsOutStream = hdfs.create(p);
 	    while(yBr.ready()){
 	    	
-	    	// split data
-
     		inputBuffer = yBr.readLine();
 	    	byte[] byt = inputBuffer.getBytes();
 	    	fsOutStream.write(byt);
