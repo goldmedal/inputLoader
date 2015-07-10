@@ -21,7 +21,7 @@ public class InputLoader {
     	
     	// FILE Read
         FileReader xFr = new FileReader(inputxPath);
-        FileReader yFr = new FileReader()
+        FileReader yFr = new FileReader(inputyPath);
         
         
     }
