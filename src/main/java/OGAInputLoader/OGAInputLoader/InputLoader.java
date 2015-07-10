@@ -25,9 +25,9 @@ public class InputLoader {
     	hdfs = FileSystem.get(conf);
 	}
 	
-	public static void put_data_to_hdfs(int index, String outputData) throws IOException
+	public static void put_data_to_hdfs(String path, String outputData) throws IOException
 	{
-		Path p = new Path("hdfs://"+hostname+":9000/hduser/R/OGA/input/XData"+index+".csv");
+		Path p = new Path(path);
 		byte[] byt = outputData.getBytes();
 		FSDataOutputStream fsOutStream = hdfs.create(p);
 		fsOutStream.write(byt);
@@ -87,7 +87,9 @@ public class InputLoader {
 		    outputBuffer = outputBuffer.substring(0, outputBuffer.length() - 1);
 		    
 		    // put data to hdfs
-		    put_data_to_hdfs(i, outputBuffer);
+		    
+		    String outputPath = "hdfs://"+hostname+":9000/hduser/R/OGA/inputx/data"+i+".csv";
+		    put_data_to_hdfs(outputPath, outputBuffer);
 		    
 		   // System.out.println(outputBuffer);
 		    
@@ -98,8 +100,24 @@ public class InputLoader {
 		    xFr.close();
 		    
         }
-        	
-       
+        
+        // write y data
+        
+        String outputPath = "hdfs://"+hostname+":9000/hduser/R/OGA/inputy/data.csv";
+        Path p = new Path(outputPath);
+        FSDataOutputStream fsOutStream = hdfs.create(p);
+	    while(yBr.ready()){
+	    	
+	    	// split data
+
+    		inputBuffer = yBr.readLine();
+	    	byte[] byt = inputBuffer.getBytes();
+	    	fsOutStream.write(byt);
+	    	
+	    	
+	    }
+	    
+		fsOutStream.close();
         yFr.close();
         
     }
