@@ -48,7 +48,7 @@ public class InputLoader {
    
     	// set Hadoop Configuration
     	
-    	// set_hadoop();
+    	set_hadoop();
     	
     	// set FILE Reader
         FileReader xFr = new FileReader(inputxPath);
