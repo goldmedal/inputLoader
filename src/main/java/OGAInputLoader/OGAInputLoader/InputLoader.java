@@ -14,7 +14,7 @@ import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 public class InputLoader {
 	
-    public static void main( String[] args )
+    public static void main( String[] args ) throws IOException
     {
     	String inputxPath = "inputx.csv";
     	String inputyPath = "inputy.csv";
@@ -23,6 +23,8 @@ public class InputLoader {
         FileReader xFr = new FileReader(inputxPath);
         FileReader yFr = new FileReader(inputyPath);
         
+        xFr.close();
+        yFr.close();
         
     }
 
