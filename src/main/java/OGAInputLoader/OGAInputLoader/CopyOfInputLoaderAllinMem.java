@@ -12,7 +12,7 @@ import org.apache.hadoop.mapreduce.lib.input.FileInputFormat;
 import org.apache.hadoop.mapreduce.lib.output.FileOutputFormat;
 
 
-public class InputLoader {
+public class CopyOfInputLoaderAllinMem {
 	
 
 	private static Configuration conf;
@@ -63,68 +63,58 @@ public class InputLoader {
         
     	inputBuffer = xBr.readLine();
     	String[] splitRow = inputBuffer.split(",");
+    	List<String[]> Row = new ArrayList<String[]>();
     	
     	// get the X size
    		xSize = splitRow.length;
-   		xBr.close();
-   		xFr.close();
-   		int check = 0;
+   	
    		int i = 0;
-   		//String outputPath = "hdfs://"+hostname+":9000/hduser/R/OGA/inputx/data.csv";
-   	  	//Path p = new Path(outputPath);
-   	  	Path dst = new Path("/hduser/R/OGA/inputx/data.csv");
-   	  	Path src = new Path("data.csv");
-   	  	
+   		int j = 0;
+   		int check = 0;
    	  	
    		//FSDataOutputStream fsOutStream = hdfs.create(p);1
-        for(i=0;i<xSize;i++){
-        	
-        	xFr = new FileReader(inputxPath);
-        	xBr = new BufferedReader(xFr);
-        	
-		    while(xBr.ready()){
-		    	
-		    	// split data
-	
-	    		inputBuffer = xBr.readLine();
-	    		splitRow = inputBuffer.split(",");
 
-		    	outputBuffer = outputBuffer + splitRow[i] + ",";
-		    	
-		    }
-		    
-		    outputBuffer = outputBuffer.substring(0, outputBuffer.length() - 1) +"\n";
-		    
-		    // put data to hdfs
-		    
-		  
-		 //   put_data_to_hdfs(outputPath, outputBuffer);
-				
-//			byte[] byt = outputBuffer.getBytes();
-			
-			 //fsOutStream.write(byt);
-			if( (i%500) == 0 ){
-				fw.write(outputBuffer);
-				outputBuffer = "";
-				check = 1;
+	    while(xBr.ready()){
+	    	
+	    	// split data
+	    	
+    		inputBuffer = xBr.readLine();
+    		splitRow = inputBuffer.split(",");
+    		if(check == 0){ 
+    			check  = 1;
+    			xSize = splitRow.length;
+    		}
+    		Row.add(splitRow);
+    		
+	    }
+	    System.out.println("load over");
+   		String outputPath = "/hduser/R/OGA/inputx/data.csv";
+   	  	Path p = new Path(outputPath);
+	    FSDataOutputStream fsOutStream = hdfs.create(p);
+	    
+		for(i=0;i<xSize;i++){
+
+			for(String[] row : Row){
+				outputBuffer = outputBuffer + row[i] + ",";
 			}
-		   // System.out.println(outputBuffer);
-		    
-		    // reset
-		    
-		   
-		    xBr.close();
-		    xFr.close();
-		    
-        }
-        if(check==0){ 
-			fw.write(outputBuffer);
-			outputBuffer = "";	
-        }
-        hdfs.copyFromLocalFile(src, dst);
+			
+			outputBuffer = outputBuffer.substring(0, outputBuffer.length() - 1) +"\n";
+			// fw.write(outputBuffer);
+			// outputBuffer = "";	
+			
+		}
+		  System.out.println("output over. ready to hdfs");    	   
+	    xBr.close();
+	    xFr.close();
+	    
+	    byte[] byt = outputBuffer.getBytes();
+	    fsOutStream.write(byt);
+        
+        //hdfs.copyFromLocalFile(src, dst);
+		fsOutStream.close();
         hdfs.close();
-        fw.flush();
-        fw.close();
+      //  fw.flush();
+      //  fw.close();
         long ProcessTime = System.currentTimeMillis() - StartTime; // 計算處理時間
         System.out.printf("i = %d\n", i);
         System.out.printf("time = %d\n", ProcessTime);
