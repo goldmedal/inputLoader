@@ -39,7 +39,6 @@ public class CopyOfInputLoaderAllinMem {
     {
    
     	System.out.println("--------- Program Start -------");
-    	long StartTime = System.currentTimeMillis(); // 取出目前時間
     	String inputxPath = "inputx.csv";  // the X data input path
   //  	String inputyPath = "C://Users/Jax/Desktop/inputy.csv"; // the Y data input path
     	String inputBuffer = "";  
@@ -73,7 +72,7 @@ public class CopyOfInputLoaderAllinMem {
    		int check = 0;
    	  	
    		//FSDataOutputStream fsOutStream = hdfs.create(p);1
-
+   		long StartTime = System.currentTimeMillis(); // 取出目前時間
 	    while(xBr.ready()){
 	    	
 	    	// split data
@@ -87,10 +86,15 @@ public class CopyOfInputLoaderAllinMem {
     		Row.add(splitRow);
     		
 	    }
+	    long ProcessTime = System.currentTimeMillis() - StartTime; // 計算處理時間
+	    System.out.printf("load time = %d\n", ProcessTime);
+	    
 	    System.out.println("load over");
    		String outputPath = "/hduser/R/OGA/inputx/data.csv";
    	  	Path p = new Path(outputPath);
 	    FSDataOutputStream fsOutStream = hdfs.create(p);
+	    
+	    StartTime = System.currentTimeMillis(); // 取出目前時間
 	    
 		for(i=0;i<xSize;i++){
 
@@ -103,21 +107,26 @@ public class CopyOfInputLoaderAllinMem {
 			// outputBuffer = "";	
 			
 		}
-		  System.out.println("output over. ready to hdfs");    	   
+		ProcessTime = System.currentTimeMillis() - StartTime; // 計算處理時間
+		  System.out.printf("trans time = %d\n", ProcessTime);
+		  System.out.println("output over. ready to hdfs");
+		  System.out.printf("xSize: %d RowLen: %d\n", xSize, Row.size());
 	    xBr.close();
 	    xFr.close();
 	    
 	    byte[] byt = outputBuffer.getBytes();
-	    fsOutStream.write(byt);
-        
+	    StartTime = System.currentTimeMillis(); // 取出目前時間
+	   fsOutStream.write(byt);
+	   ProcessTime = System.currentTimeMillis() - StartTime; // 計算處理時間
+	   System.out.printf("to hdfs time = %d\n", ProcessTime);
         //hdfs.copyFromLocalFile(src, dst);
 		fsOutStream.close();
         hdfs.close();
       //  fw.flush();
       //  fw.close();
-        long ProcessTime = System.currentTimeMillis() - StartTime; // 計算處理時間
+        
         System.out.printf("i = %d\n", i);
-        System.out.printf("time = %d\n", ProcessTime);
+      
         
         // write y data
         

@@ -68,15 +68,18 @@ public class InputLoader {
    		xSize = splitRow.length;
    		xBr.close();
    		xFr.close();
+   		
+   		
    		int check = 0;
    		int i = 0;
-   		//String outputPath = "hdfs://"+hostname+":9000/hduser/R/OGA/inputx/data.csv";
-   	  	//Path p = new Path(outputPath);
-   	  	Path dst = new Path("/hduser/R/OGA/inputx/data.csv");
-   	  	Path src = new Path("data.csv");
+   		String outputPath = "hdfs://"+hostname+":9000/hduser/R/OGA/inputx/data.csv";
+   	  	Path p = new Path(outputPath);
+   	 // 	Path dst = new Path("/hduser/R/OGA/inputx/data.csv");
+   	 // 	Path src = new Path("data.csv");
    	  	
    	  	
-   		//FSDataOutputStream fsOutStream = hdfs.create(p);1
+   		FSDataOutputStream fsOutStream = hdfs.create(p);
+   		long StartTime1 = System.currentTimeMillis(); // 取出目前時間
         for(i=0;i<xSize;i++){
         	
         	xFr = new FileReader(inputxPath);
@@ -100,14 +103,13 @@ public class InputLoader {
 		  
 		 //   put_data_to_hdfs(outputPath, outputBuffer);
 				
-//			byte[] byt = outputBuffer.getBytes();
-			
-			 //fsOutStream.write(byt);
-			if( (i%500) == 0 ){
+
+/*			if( (i%500) == 0 ){
 				fw.write(outputBuffer);
 				outputBuffer = "";
 				check = 1;
 			}
+*/			
 		   // System.out.println(outputBuffer);
 		    
 		    // reset
@@ -117,14 +119,18 @@ public class InputLoader {
 		    xFr.close();
 		    
         }
-        if(check==0){ 
-			fw.write(outputBuffer);
-			outputBuffer = "";	
-        }
-        hdfs.copyFromLocalFile(src, dst);
+        long ProcessTime1 = System.currentTimeMillis() - StartTime1; // 計算處理時間
+        System.out.printf("load and trans time = %d\n", ProcessTime1);
+		byte[] byt = outputBuffer.getBytes();
+		
+		fsOutStream.write(byt);
+		fsOutStream.close();
+		
+		
+    //    hdfs.copyFromLocalFile(src, dst);
         hdfs.close();
-        fw.flush();
-        fw.close();
+    //    fw.flush();
+ //       fw.close();
         long ProcessTime = System.currentTimeMillis() - StartTime; // 計算處理時間
         System.out.printf("i = %d\n", i);
         System.out.printf("time = %d\n", ProcessTime);
